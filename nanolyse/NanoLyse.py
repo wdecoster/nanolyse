@@ -5,12 +5,13 @@ import argparse
 import sys
 from nanolyse.version import __version__
 from os import path
+from Bio import SeqIO
 
 
 def main():
     args = getArgs()
-    ind = getIndex()
-    align(ind, sys.stdin)
+    aligner = getIndex()
+    align(aligner, sys.stdin)
 
 
 def getArgs():
@@ -29,24 +30,24 @@ def getIndex():
     Find the reference folder using the location of the script file
     Create the index, test if successful
     '''
-    parent_directory = path.dir(path.dir(path.abspath(path.dirname(__file__))))
+    parent_directory = path.dirname(path.abspath(path.dirname(__file__)))
     reffas = path.join(parent_directory, "reference/lambda.fasta.gz")
     if not path.isfile(reffas):
         sys.exit("Could not find reference fasta for lambda genome.")
-    ind = mp.Aligner(reffas)  # build index
-    if not ind:
+    aligner = mp.Aligner(reffas, preset="map-ont")  # build index
+    if not aligner:
         raise Exception("ERROR: failed to load/build index")
-    return ind
+    return aligner
 
 
-def align(index, reads):
+def align(aligner, reads):
     '''
     Test if reads can get aligned to the lambda genome,
     if not: write to stdout
     '''
-    for name, seq, qual in mp.fastx_read(reads):  # read a fasta/q sequence
-        for hit in index.map(seq):  # traverse alignments
-            print("{}\t{}\t{}\t{}".format(hit.ctg, hit.r_st, hit.r_en, hit.cigar_str))
+    for record in SeqIO.parse(reads, "fastq"):
+        for hit in aligner.map(str(record.seq)):  # traverse alignments
+            print("{}".format(hit.mapq))
 
 
 if __name__ == '__main__':
