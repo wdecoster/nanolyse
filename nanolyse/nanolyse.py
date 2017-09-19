@@ -7,6 +7,12 @@ from nanolyse.version import __version__
 from os import path
 
 
+def main():
+    args = getArgs()
+    ind = getIndex()
+    align(ind, sys.stdin)
+
+
 def getArgs():
     parser = argparse.ArgumentParser(
         description="Remove reads mapping to the lambda genome, \
@@ -23,26 +29,24 @@ def getIndex():
     Find the reference folder using the location of the script file
     Create the index, test if successful
     '''
-    directory = path.dir(path.dir(path.abspath(path.dirname(__file__))))
-    reffas = path.join(directory, "reference/lambda.fasta.gz")
+    parent_directory = path.dir(path.dir(path.abspath(path.dirname(__file__))))
+    reffas = path.join(parent_directory, "reference/lambda.fasta.gz")
     if not path.isfile(reffas):
         sys.exit("Could not find reference fasta for lambda genome.")
-    ind = mp.Aligner("test/MT-human.fa")  # load or build index
+    ind = mp.Aligner(reffas)  # build index
     if not ind:
         raise Exception("ERROR: failed to load/build index")
     return ind
 
 
 def align(index, reads):
+    '''
+    Test if reads can get aligned to the lambda genome,
+    if not: write to stdout
+    '''
     for name, seq, qual in mp.fastx_read(reads):  # read a fasta/q sequence
         for hit in index.map(seq):  # traverse alignments
             print("{}\t{}\t{}\t{}".format(hit.ctg, hit.r_st, hit.r_en, hit.cigar_str))
-
-
-def main():
-    args = getArgs()
-    ind = getIndex()
-    align(ind, sys.stdin)
 
 
 if __name__ == '__main__':
