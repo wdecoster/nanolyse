@@ -16,8 +16,13 @@ def main():
 
 def getArgs():
     parser = argparse.ArgumentParser(
-        description="Remove reads mapping to the lambda genome, \
-                     reads from stdin and writes to stdout.")
+        description="""
+                    Remove reads mapping to the lambda genome.
+                    Reads fastq from stdin and writes to stdout.\n
+                    Example usage:
+                    zcat reads.fastq.gz | NanoLyse | gzip > reads_without_lambda.fastq.gz
+                    """,
+        formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-v", "--version",
                         help="Print version and exit.",
                         action="version",
@@ -46,8 +51,10 @@ def align(aligner, reads):
     if not: write to stdout
     '''
     for record in SeqIO.parse(reads, "fastq"):
-        for hit in aligner.map(str(record.seq)):  # traverse alignments
-            print("{}".format(hit.mapq))
+        try:
+            next(aligner.map(str(record.seq)))
+        except StopIteration:
+            print(record.format("fastq"), end='')
 
 
 if __name__ == '__main__':
