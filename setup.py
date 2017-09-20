@@ -28,7 +28,7 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     keywords='nanopore sequencing processing',
-    packages=find_packages(),
+    packages=find_packages() + ['reference'],
     install_requires=['mappy>=2.2'],
     package_data={'nanolyse': []},
     package_dir={'nanolyse': 'nanolyse'},
