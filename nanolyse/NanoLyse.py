@@ -10,7 +10,7 @@ from Bio import SeqIO
 
 def main():
     args = getArgs()
-    aligner = getIndex()
+    aligner = getIndex(args.reference)
     align(aligner, sys.stdin)
 
 
@@ -27,16 +27,21 @@ def getArgs():
                         help="Print version and exit.",
                         action="version",
                         version='NanoLyse {}'.format(__version__))
+    parser.add_argument("-r", "--reference",
+                        help="Specify a reference fasta file against which to filter.")
     return parser.parse_args()
 
 
-def getIndex():
+def getIndex(reference):
     '''
     Find the reference folder using the location of the script file
     Create the index, test if successful
     '''
-    parent_directory = path.dirname(path.abspath(path.dirname(__file__)))
-    reffas = path.join(parent_directory, "reference/lambda.fasta.gz")
+    if reference:
+        reffas = reference
+    else:
+        parent_directory = path.dirname(path.abspath(path.dirname(__file__)))
+        reffas = path.join(parent_directory, "reference/lambda.fasta.gz")
     if not path.isfile(reffas):
         sys.exit("Could not find reference fasta for lambda genome.")
     aligner = mp.Aligner(reffas, preset="map-ont")  # build index
