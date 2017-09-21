@@ -13,7 +13,7 @@ Simple example:
 In combination with [NanoFilt](https://github.com/wdecoster/nanofilt):  
 `gunzip -c reads.fastq.gz | NanoLyse | NanoFilt -q 12 | gzip > filtered_reads_without_lambda.fastq.gz`  
 Using a different genome to filter on (rather than lambda phage):  
-`gunzip -c reads.fastq.gz | NanoLyse --reference mygenome.fa.gz | gzip > filtered_reads_without_mygenome.fastq.gz`  
+`gunzip -c reads.fastq.gz | NanoLyse --reference mygenome.fa.gz | gzip > reads_without_mygenome.fastq.gz`  
 
 
 ### WARNING
