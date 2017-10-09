@@ -1,5 +1,6 @@
 # wdecoster
 
+from __future__ import print_function
 import mappy as mp
 import argparse
 import sys
