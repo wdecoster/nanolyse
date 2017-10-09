@@ -29,7 +29,9 @@ setup(
     ],
     keywords='nanopore sequencing processing',
     packages=find_packages() + ['reference'],
-    install_requires=['mappy>=2.2'],
+    install_requires=[
+        'mappy>=2.2',
+        'biopython'],
     package_data={'nanolyse': []},
     package_dir={'nanolyse': 'nanolyse'},
     include_package_data=True,
