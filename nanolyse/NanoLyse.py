@@ -7,15 +7,29 @@ import sys
 from nanolyse.version import __version__
 from os import path
 from Bio import SeqIO
+import logging
 
 
 def main():
-    args = getArgs()
-    aligner = getIndex(args.reference)
-    align(aligner, sys.stdin)
+    args = get_args()
+    try:
+        logging.basicConfig(
+            format='%(asctime)s %(message)s',
+            filename="NanoLyse.log",
+            level=logging.INFO)
+    except PermissionError:
+        pass  # indicates that user has no write permission in this directory. No logs then
+    try:
+        logging.info('NanoLyse {} started with arguments {}'.format(__version__, args))
+        aligner = getIndex(args.reference)
+        align(aligner, sys.stdin)
+        logging.info('NanoLyse finished.')
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        raise
 
 
-def getArgs():
+def get_args():
     parser = argparse.ArgumentParser(
         description="""
                     Remove reads mapping to the lambda genome.
@@ -44,9 +58,11 @@ def getIndex(reference):
         parent_directory = path.dirname(path.abspath(path.dirname(__file__)))
         reffas = path.join(parent_directory, "reference/lambda.fasta.gz")
     if not path.isfile(reffas):
+        logging.error("Could not find reference fasta for lambda genome.")
         sys.exit("Could not find reference fasta for lambda genome.")
     aligner = mp.Aligner(reffas, preset="map-ont")  # build index
     if not aligner:
+        logging.error("Failed to load/build index")
         raise Exception("ERROR: failed to load/build index")
     return aligner
 
