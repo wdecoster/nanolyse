@@ -1,3 +1,4 @@
 NanoLyse.egg-info/
 README.rst
 nanolyse/__pycache__/
+dist/
