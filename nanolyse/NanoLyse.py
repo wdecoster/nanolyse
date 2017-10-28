@@ -2,12 +2,33 @@
 
 from __future__ import print_function
 import mappy as mp
-import argparse
+from argparse import HelpFormatter, ArgumentParser
 import sys
 from nanolyse.version import __version__
 from os import path
 from Bio import SeqIO
 import logging
+import textwrap as _textwrap
+
+
+class CustomHelpFormatter(HelpFormatter):
+    def _format_action_invocation(self, action):
+        if not action.option_strings or action.nargs == 0:
+            return super()._format_action_invocation(action)
+        default = self._get_default_metavar_for_optional(action)
+        args_string = self._format_args(action, default)
+        return ', '.join(action.option_strings) + ' ' + args_string
+
+    def _fill_text(self, text, width, indent):
+        return ''.join(indent + line for line in text.splitlines(keepends=True))
+
+    def _split_lines(self, text, width):
+        text = self._whitespace_matcher.sub(' ', text).strip()
+        return _textwrap.wrap(text, 80)
+
+
+def custom_formatter(prog):
+    return CustomHelpFormatter(prog)
 
 
 def main():
@@ -30,18 +51,25 @@ def main():
 
 
 def get_args():
-    parser = argparse.ArgumentParser(
-        description="""
-                    Remove reads mapping to the lambda genome.
-                    Reads fastq from stdin and writes to stdout.\n
-                    Example usage:
-                    zcat reads.fastq.gz | NanoLyse | gzip > reads_without_lambda.fastq.gz
-                    """,
-        formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("-v", "--version",
-                        help="Print version and exit.",
-                        action="version",
-                        version='NanoLyse {}'.format(__version__))
+    epilog = """EXAMPLES:
+    gunzip -c reads.fastq.gz | NanoLyse | gzip > reads_without_lambda.fastq.gz
+    gunzip -c reads.fastq.gz | NanoLyse | NanoFilt -q 12 | gzip > filtered_reads_without_lambda.fastq.gz
+    gunzip -c reads.fastq.gz | NanoLyse --reference mygenome.fa.gz | gzip > reads_without_mygenome.fastq.gz
+    """
+    parser = ArgumentParser(
+        description="Remove reads mapping to the lambda genome. Reads fastq from stdin and writes to stdout.",
+        epilog=epilog,
+        formatter_class=custom_formatter,
+        add_help=False)
+    general = parser.add_argument_group(
+        title='General options')
+    general.add_argument("-h", "--help",
+                         action="help",
+                         help="show the help and exit")
+    general.add_argument("-v", "--version",
+                         help="Print version and exit.",
+                         action="version",
+                         version='NanoLyse {}'.format(__version__))
     parser.add_argument("-r", "--reference",
                         help="Specify a reference fasta file against which to filter.")
     return parser.parse_args()
