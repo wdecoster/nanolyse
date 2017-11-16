@@ -3,9 +3,20 @@ language: python
 python:
   - "3.4"
   - "3.5"
-  - "3.5-dev" # 3.5 development branch
+  - "3.5-dev"
   - "3.6"
-# command to install dependencies
-install: "pip install NanoLyse"
-# command to run tests
+
+
+before_install:
+  - cp README.md README.rst
+
+install:
+  - pip install -e .
+
 script: python -c "import nanolyse"
+
+notifications:
+  email: false
+  webhooks:
+    urls:
+        - https://webhooks.gitter.im/e/4b1c45cea6826ce475c2
