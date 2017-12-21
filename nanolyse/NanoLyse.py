@@ -100,11 +100,14 @@ def align(aligner, reads):
     Test if reads can get aligned to the lambda genome,
     if not: write to stdout
     '''
+    i = 0
     for record in SeqIO.parse(reads, "fastq"):
         try:
             next(aligner.map(str(record.seq)))
+            i += 1
         except StopIteration:
             print(record.format("fastq"), end='')
+    sys.stderr.write("NanoLyse: removed {} reads.\n".format(i))
 
 
 if __name__ == '__main__':
