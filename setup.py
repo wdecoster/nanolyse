@@ -29,6 +29,7 @@ setup(
     ],
     keywords='nanopore sequencing processing',
     packages=find_packages() + ['reference'],
+    python_requires='>=3',
     install_requires=[
         'mappy>=2.2',
         'biopython'],
