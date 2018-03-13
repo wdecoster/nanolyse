@@ -84,7 +84,7 @@ def getIndex(reference):
         reffas = reference
     else:
         parent_directory = path.dirname(path.abspath(path.dirname(__file__)))
-        reffas = path.join(parent_directory, "reference/lambda.fasta.gz")
+        reffas = path.join(parent_directory, "reference/DNA_CS.fasta")
     if not path.isfile(reffas):
         logging.error("Could not find reference fasta for lambda genome.")
         sys.exit("Could not find reference fasta for lambda genome.")
