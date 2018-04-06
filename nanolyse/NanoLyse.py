@@ -36,7 +36,7 @@ def main():
     try:
         logging.basicConfig(
             format='%(asctime)s %(message)s',
-            filename="NanoLyse.log",
+            filename=args.logfile,
             level=logging.INFO)
     except PermissionError:
         pass  # indicates that user has no write permission in this directory. No logs then
@@ -72,6 +72,9 @@ def get_args():
                          version='NanoLyse {}'.format(__version__))
     parser.add_argument("-r", "--reference",
                         help="Specify a reference fasta file against which to filter.")
+    parser.add_argument("--logfile",
+                        help="Specify the path and filename for the log file.",
+                        default="NanoLyse.log")
     return parser.parse_args()
 
 
