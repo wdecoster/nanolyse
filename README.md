@@ -3,7 +3,7 @@ Remove reads mapping to the lambda phage genome from a fastq file.
 This script uses Heng Li's [minimap2](https://github.com/lh3/minimap2) and his [mappy](https://pypi.python.org/pypi/mappy) Python binding.
 
 [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/wouter_decoster.svg?style=social&label=Follow%20%40wouter_decoster)](https://twitter.com/wouter_decoster)
-[![Build Status](https://travis-ci.org/wdecoster/nanolyse.svg?branch=master)](https://travis-ci.org/wdecoster/nanolyse) [![Code Health](https://landscape.io/github/wdecoster/nanolyse/master/landscape.svg?style=flat)](https://landscape.io/github/wdecoster/nanolyse/master)
+[![Build Status](https://travis-ci.org/wdecoster/nanolyse.svg?branch=master)](https://travis-ci.org/wdecoster/nanolyse)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io/recipes/nanolyse/README.html)
 
 
