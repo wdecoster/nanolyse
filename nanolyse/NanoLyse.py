@@ -53,11 +53,11 @@ def main():
 def get_args():
     epilog = """EXAMPLES:
     gunzip -c reads.fastq.gz | NanoLyse | gzip > reads_without_lambda.fastq.gz
-    gunzip -c reads.fastq.gz | NanoLyse | NanoFilt -q 12 | gzip > filtered_reads_without_lambda.fastq.gz
-    gunzip -c reads.fastq.gz | NanoLyse --reference mygenome.fa.gz | gzip > reads_without_mygenome.fastq.gz
+    gunzip -c reads.fastq.gz | NanoLyse | NanoFilt -q 12 | gzip > filt_reads_without_lambda.fastq.gz
+    gunzip -c reads.fastq.gz | NanoLyse --reference mydb.fa.gz | gzip > reads_without_mydb.fastq.gz
     """
     parser = ArgumentParser(
-        description="Remove reads mapping to the lambda genome. Reads fastq from stdin and writes to stdout.",
+        description="Remove reads mapping to DNA CS. Reads fastq on stdin and writes to stdout.",
         epilog=epilog,
         formatter_class=custom_formatter,
         add_help=False)
