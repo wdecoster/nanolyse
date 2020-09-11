@@ -111,7 +111,7 @@ def align(aligner, reads):
         except StopIteration:
             print(record.format("fastq"), end='')
     sys.stderr.write("NanoLyse: removed {} reads.\n".format(i))
-    logging.info("NanoLyse: removed {} reads.\n".format(i))
+    logging.info("NanoLyse: removed {} reads.".format(i))
 
 
 if __name__ == '__main__':
