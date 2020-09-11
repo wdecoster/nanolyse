@@ -43,7 +43,14 @@ def main():
     try:
         logging.info('NanoLyse {} started with arguments {}'.format(__version__, args))
         aligner = getIndex(args.reference)
-        align(aligner, sys.stdin)
+        if args.summary_in:
+            import tempfile
+            tmp = tempfile.TemporaryFile()
+            filter_reads(aligner, sys.stdin, tmp=tmp)
+            logging.info('Filtering the summary file.')
+            filter_summary(args.summary_in, args.summary_out, tmp)
+        else:
+            filter_reads(aligner, sys.stdin)
         logging.info('NanoLyse finished.')
     except Exception as e:
         logging.error(e, exc_info=True)
@@ -70,12 +77,17 @@ def get_args():
                          help="Print version and exit.",
                          action="version",
                          version='NanoLyse {}'.format(__version__))
+    parser.add_argument("--summary_in", help="Summary file to filter")
+    parser.add_argument("--summary_out", help="with --summary_in: name of output file.")
     parser.add_argument("-r", "--reference",
-                        help="Specify a reference fasta file against which to filter.")
+                        help="Specify a fasta file against which to filter. Standard is DNA CS.")
     parser.add_argument("--logfile",
                         help="Specify the path and filename for the log file.",
                         default="NanoLyse.log")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if bool(args.summary_in) != bool(args.summary_out):
+        sys.exit("ERROR: With --summary_in also --summary_out is required and vice versa!")
+    return args
 
 
 def getIndex(reference):
@@ -98,20 +110,47 @@ def getIndex(reference):
     return aligner
 
 
-def align(aligner, reads):
+def filter_reads(aligner, reads, tmp=None):
     '''
     Test if reads can get aligned to the lambda genome,
     if not: write to stdout
+
+    if tmp is not None, then write lambda read identifiers to this file
+    To filter the summary file on later
     '''
     i = 0
     for record in SeqIO.parse(reads, "fastq"):
         try:
             next(aligner.map(str(record.seq)))
             i += 1
+            if tmp:
+                tmp.write(record.id.encode('utf-8') + b"\n")
         except StopIteration:
             print(record.format("fastq"), end='')
     sys.stderr.write("NanoLyse: removed {} reads.\n".format(i))
     logging.info("NanoLyse: removed {} reads.".format(i))
+
+
+def filter_summary(summary_file, output, read_ids_file):
+    '''
+    Optional function to filter entries from a sequencing_summary file
+    using a read_ids_file (tmp) to which the identifiers have been written
+    '''
+    read_ids_file.seek(0)
+    lambda_identifiers = [line.rstrip() for line in read_ids_file]
+    sys.stderr.write(f"{len(lambda_identifiers)} lambda reads to remove from the summary\n")
+    i = 0
+    j = 0
+    with open(output, 'wb') as summary_out, open(summary_file, 'rb') as summary_in:
+        header = next(summary_in)
+        summary_out.write(header)
+        index = header.split(b'\t').index(b'read_id')
+        for line in summary_in:
+            i += 1
+            if not line.split(b'\t')[index] in lambda_identifiers:
+                summary_out.write(line)
+                j += 1
+    sys.stderr.write(f"summary had {i} lines, of which {j} got kept\n")
 
 
 if __name__ == '__main__':
