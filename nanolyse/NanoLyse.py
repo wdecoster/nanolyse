@@ -144,7 +144,13 @@ def filter_summary(summary_file, output, read_ids_file):
     with open(output, 'wb') as summary_out, open(summary_file, 'rb') as summary_in:
         header = next(summary_in)
         summary_out.write(header)
-        index = header.split(b'\t').index(b'read_id')
+        try:
+            index = header.split(b'\t').index(b'read_id')
+        except ValueError:
+            sys.stderr.write("ERROR: Filtering your FASTQ went okay.\n")
+            sys.stderr.write("But something unexpected happened with the summary file.\n")
+            sys.stderr.write("Header which NanoLyse was trying to parse: {}\n".format(header))
+            raise
         for line in summary_in:
             i += 1
             if not line.split(b'\t')[index] in lambda_identifiers:
