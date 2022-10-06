@@ -1,2 +1,3 @@
 include reference/lambda.fasta.gz
+include reference/DNA_CS.fasta
 include README.md
